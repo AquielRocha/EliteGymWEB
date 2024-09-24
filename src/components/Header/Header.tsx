@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { Dumbbell, User, ChevronDown } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu" // Importando os componentes do dropdown
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card" // Importando o HoverCard
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
@@ -29,43 +30,67 @@ export default function Header() {
             </Link>
           </div>
           <nav className="hidden md:flex space-x-4">
-            {navItems.map((item) => (
-              item.name === 'Opções' ? (
-                <DropdownMenu key={item.name}>
-                  <DropdownMenuTrigger>
-                    <Button variant="outline" className="flex items-center space-x-2">
-                      <span>{item.name}</span>
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem asChild>
-                      <Link href="/Settings" className="w-full">
-                        Configurações
+            {navItems.map((item) => {
+              if (item.name === 'Opções') {
+                return (
+                  <DropdownMenu key={item.name}>
+                    <DropdownMenuTrigger>
+                      <Button variant="outline" className="flex items-center space-x-2">
+                        <span>{item.name}</span>
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem asChild>
+                        <Link href="/Settings" className="w-full">
+                          Configurações
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/Profile" className="w-full">
+                          Perfil
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/Logout" className="w-full">
+                          Sair
+                        </Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )
+              } else if (item.name === 'Alunos - Professores' || item.name === 'Aulas' || item.name === 'Aparelhos') {
+                return (
+                  <HoverCard key={item.name}>
+                    <HoverCardTrigger asChild>
+                      <Link
+                        href={item.href}
+                        className="text-muted-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium"
+                      >
+                        {item.name}
                       </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/Profile" className="w-full">
-                        Perfil
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/Logout" className="w-full">
-                        Sair
-                      </Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="text-muted-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  {item.name}
-                </Link>
-              )
-            ))}
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-64">
+                      <p className="text-sm">
+                        {item.name === 'Alunos - Professores' && "Gerencie os alunos e professores. Você pode adicionar, visualizar, editar ou remover perfis."}
+                        {item.name === 'Aulas' && "Administre as aulas oferecidas. Crie, edite, veja detalhes ou exclua aulas do sistema."}
+                        {item.name === 'Aparelhos' && "Controle os aparelhos disponíveis. Registre novos aparelhos, atualize informações ou remova itens obsoletos."}
+                      </p>
+                    </HoverCardContent>
+                  </HoverCard>
+                )
+              } else {
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="text-muted-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    {item.name}
+                  </Link>
+                )
+              }
+            })}
           </nav>
           <div className="hidden md:flex items-center space-x-4">
             <User />
