@@ -1,5 +1,6 @@
 import Header from "@/components/Header/Header";
 import "../globals.css";
+import { Separator } from "@/components/ui/separator";
 
 export default function RootLayout({
   children,
@@ -12,9 +13,11 @@ export default function RootLayout({
         <title>Elite Gym</title>
       </head>
       <body>
-     <Header />
-
-        {children}
+        <Header />
+        <Separator />
+        <div>
+          {children}
+        </div>
       </body>
     </html>
   );

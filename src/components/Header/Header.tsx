@@ -2,18 +2,20 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Dumbbell, User } from 'lucide-react'
+import { Dumbbell, User, ChevronDown } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu" // Importando os componentes do dropdown
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
 
   const navItems = [
     { name: 'Home', href: '/home' },
-    { name: 'Alunos', href: '/home/Alunos' },
-    { name: 'Aulas', href: '/Aulas' },
+    { name: 'Alunos - Professores', href: '/home/Alunos' },
+    { name: 'Aulas', href: '/home/Aulas' },
     { name: 'Aparelhos', href: '/Aparelhos' },
+    { name: 'Opções', href: '/Settings' },
   ]
 
   return (
@@ -28,19 +30,47 @@ export default function Header() {
           </div>
           <nav className="hidden md:flex space-x-4">
             {navItems.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="text-muted-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium"
-              >
-                {item.name}
-              </Link>
+              item.name === 'Opções' ? (
+                <DropdownMenu key={item.name}>
+                  <DropdownMenuTrigger>
+                    <Button variant="outline" className="flex items-center space-x-2">
+                      <span>{item.name}</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem asChild>
+                      <Link href="/Settings" className="w-full">
+                        Configurações
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/Profile" className="w-full">
+                        Perfil
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/Logout" className="w-full">
+                        Sair
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="text-muted-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  {item.name}
+                </Link>
+              )
             ))}
           </nav>
           <div className="hidden md:flex items-center space-x-4">
-  <User />
-  <Button>Logout</Button>
-</div>
+            <User />
+            <Button>Logout</Button>
+          </div>
 
           <div className="md:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>

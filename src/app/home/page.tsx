@@ -12,13 +12,22 @@ export default function PaginaInicial() {
   }, []);
 
   return (
-    <div>
-      <h1>Bem-vindo à Página Inicial</h1>
-      <p>Data: {date}</p>
-      <button onClick={() => refetch()}>Recarregar</button>
-      {isLoading && <p>Carregando...</p>}
-      {error && <p>Erro ao carregar</p>}
+    <div style={{ width: "100vw", height: "100vh", margin: 0, padding: 0 }}>
+      <h1 style={{ fontSize: "2em", color: "#333", textAlign: "center" }}>Bem-vindo Undefined a Página Inicial!</h1>
+      <h4 style={{ fontSize: "1.2em", color: "#666", textAlign: "center" }}>Data: {date}</h4>
+   
+   
+      <iframe
+        title="Dashboard do Power BI"
+        width="100%"
+        height="100%"
+        src="https://app.powerbi.com/view?r=eyJrIjoiMGVmNTFlYTktOTk1NS00MDI2LWJmMDMtYWM1ZTQ5M2Y2NDQzIiwidCI6ImMxNGUyYjU2LWM1YmMtNDNiZC1hZDljLTQwOGNmNmNjMzU2MCJ9" 
+        frameBorder="0"
+        allowFullScreen
+        style={{ border: "none" }}
+      ></iframe>
 
+      {error && <p>Erro ao carregar</p>}
     </div>
   );
 }
