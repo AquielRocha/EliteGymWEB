@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import api from '@/api/axios'; // Importando sua instância de API configurada
-import { useState } from 'react';
+import api from '@/api/axios'; 
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-// Opções de categorias de músculos
 const categoriasMusculos = [
   { label: "Braços", value: "braços" },
   { label: "Pernas", value: "pernas" },
@@ -20,11 +20,11 @@ const categoriasMusculos = [
   { label: "Ombros", value: "ombros" },
 ];
 
-// Schema de validação usando Zod
+// Validação de formulário usando Zod
 const aparelhoSchema = z.object({
   nome: z.string().min(2, 'O nome do aparelho deve ter pelo menos 2 caracteres'),
   descricao: z.string().optional(),
-  foto: z.string().optional(), // Este campo pode armazenar a URL ou base64 da imagem
+  foto: z.string().url('A URL da imagem deve ser válida').optional(),
   categoria: z.string().min(1, 'A categoria é obrigatória'),
   manutencao: z.boolean(),
   favorite: z.boolean().optional(),
@@ -45,58 +45,94 @@ export default function AparelhoForm() {
     },
   });
 
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const aparelhoId = searchParams.get('id');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null); 
+
+  useEffect(() => {
+    const loadAparelho = async () => {
+      if (aparelhoId) {
+        setLoading(true);
+        try {
+          const { data } = await api.get(`/Aparelhos/get/${aparelhoId}`);
+          form.reset(data);
+          setPreviewUrl(data.foto);
+        } catch (err) {
+          setError('Erro ao carregar o aparelho. Tente novamente.');
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+  
+    loadAparelho();
+  }, [aparelhoId, form]);
 
   const onSubmit = async (data: AparelhoFormValues) => {
     setLoading(true);
-    setError(null);
-    setSuccess(null);
-  
-    if (data.foto && data.foto.startsWith('data:image/')) {
-      data.foto = data.foto.split(',')[1];
-    }
+    setError(null); 
+    setSuccess(null); 
   
     try {
-      const response = await api.post('aparelhos/add', data, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-  
-      if (response.status === 201) {
+      let response;
+      if (aparelhoId) {
+        const updatedData = { ...data, id: aparelhoId };
+        response = await api.put(`/Aparelhos/${aparelhoId}`, updatedData);
+        setSuccess('Aparelho atualizado com sucesso!');
+        router.push('/home/Aparelhos');
+      } else {
+        response = await api.post('/Aparelhos/add', data);
         setSuccess('Aparelho cadastrado com sucesso!');
-        form.reset(); // Reseta o formulário após o sucesso
       }
-    } catch (err) {
-      console.error(err); // Log completo do erro
-      setError('Erro ao cadastrar o aparelho. Tente novamente.');
+  
+      if (response.status === 200 || response.status === 201) {
+        form.reset(); 
+        router.push('/home/Aparelhos');
+      }
+    } catch (err: any) {
+      if (err.response) {
+        const errorMessage = typeof err.response.data === 'string'
+          ? err.response.data
+          : err.response.data?.title || 'Erro ao processar a requisição.';
+        setError(errorMessage);
+      } else if (err.request) {
+        setError('Sem resposta do servidor. Verifique sua conexão de rede.');
+      } else {
+        setError('Erro inesperado: ' + err.message);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center min-h-screen bg-gray-50">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-lg w-full bg-white p-6 rounded-lg shadow-lg">
-          <div className="space-y-4 text-center">
-            <h2 className="text-2xl font-bold text-gray-800">Cadastro de Aparelho</h2>
-            <p className="text-gray-500">Preencha os detalhes do aparelho abaixo</p>
+        <form 
+          onSubmit={form.handleSubmit(onSubmit)} 
+          className="space-y-6 max-w-2xl w-full bg-white p-8 rounded-xl shadow-md"
+        >
+          <div className="text-center mb-4">
+            <h2 className="text-3xl font-semibold text-gray-800">
+              {aparelhoId ? 'Editar Aparelho' : 'Cadastro de Aparelho'}
+            </h2>
+            <p className="text-gray-500 mt-1">Preencha os detalhes do aparelho abaixo</p>
           </div>
 
-          {/* Campo Nome */}
           <FormField
             control={form.control}
             name="nome"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-700">Nome do Aparelho</FormLabel>
+                <FormLabel className="text-gray-600">Nome do Aparelho</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Digite o nome do aparelho"
-                    className="border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg p-2"
                     {...field}
                   />
                 </FormControl>
@@ -105,17 +141,16 @@ export default function AparelhoForm() {
             )}
           />
 
-          {/* Campo Descrição */}
           <FormField
             control={form.control}
             name="descricao"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-700">Descrição</FormLabel>
+                <FormLabel className="text-gray-600">Descrição</FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder="Digite a descrição do aparelho"
-                    className="border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg p-2"
                     {...field}
                   />
                 </FormControl>
@@ -124,17 +159,16 @@ export default function AparelhoForm() {
             )}
           />
 
-          {/* Campo Categoria (Select) */}
           <FormField
             control={form.control}
             name="categoria"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-700">Categoria</FormLabel>
+                <FormLabel className="text-gray-600">Categoria</FormLabel>
                 <FormControl>
                   <select
                     {...field}
-                    className="border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 rounded-md w-full p-2"
+                    className="border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg w-full p-2"
                   >
                     <option value="">Selecione uma categoria</option>
                     {categoriasMusculos.map((categoria) => (
@@ -149,28 +183,17 @@ export default function AparelhoForm() {
             )}
           />
 
-          {/* Campo Imagem (Upload de arquivo) */}
           <FormField
             control={form.control}
             name="foto"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-700">Imagem do Aparelho</FormLabel>
+                <FormLabel className="text-gray-600">URL da Imagem do Aparelho</FormLabel>
                 <FormControl>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      if (e.target.files && e.target.files.length > 0) {
-                        const file = e.target.files[0];
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          field.onChange(reader.result?.toString() || '');
-                        };
-                        reader.readAsDataURL(file); // Converte para Base64
-                      }
-                    }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  <Input
+                    placeholder="Digite a URL da imagem do aparelho"
+                    className="border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg p-2"
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
@@ -178,14 +201,24 @@ export default function AparelhoForm() {
             )}
           />
 
+          {/* Pré-visualização da Imagem */}
+          {form.watch("foto") && (
+            <div className="mt-4 flex flex-col items-center">
+              <p className="text-gray-600 mb-2">Pré-visualização da Imagem:</p>
+              <img
+                src={form.watch("foto")}
+                alt="Pré-visualização"
+                className="w-48 h-48 object-cover rounded-lg shadow-lg border border-gray-300"
+              />
+            </div>
+          )}
 
-          {/* Campo Manutenção (Toggle Switch) */}
           <FormField
             control={form.control}
             name="manutencao"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-700">Em Manutenção</FormLabel>
+                <FormLabel className="text-gray-600">Em Manutenção</FormLabel>
                 <FormControl>
                   <label className="flex items-center cursor-pointer">
                     <div className="relative">
@@ -196,7 +229,7 @@ export default function AparelhoForm() {
                         onChange={(e) => field.onChange(e.target.checked)}
                       />
                       <div className="w-10 h-4 bg-gray-300 rounded-full shadow-inner"></div>
-                      <div className={`dot absolute w-6 h-6 bg-white rounded-full shadow -left-1 -top-1 transition ${field.value ? 'translate-x-full bg-indigo-600' : 'bg-gray-400'}`}></div>
+                      <div className={`dot absolute w-6 h-6 bg-white rounded-full shadow -left-1 -top-1 transition ${field.value ? 'translate-x-full bg-indigo-500' : 'bg-gray-400'}`}></div>
                     </div>
                     <span className="ml-3 text-gray-500">Marque se o aparelho estiver em manutenção</span>
                   </label>
@@ -206,46 +239,20 @@ export default function AparelhoForm() {
             )}
           />
 
-          {/* Campo Favorito (Toggle Switch) */}
-          <FormField
-            control={form.control}
-            name="favorite"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-700">Favorito</FormLabel>
-                <FormControl>
-                  <label className="flex items-center cursor-pointer">
-                    <div className="relative">
-                      <input
-                        type="checkbox"
-                        className="sr-only"
-                        checked={field.value}
-                        onChange={(e) => field.onChange(e.target.checked)}
-                      />
-                      <div className="w-10 h-4 bg-gray-300 rounded-full shadow-inner"></div>
-                      <div className={`dot absolute w-6 h-6 bg-white rounded-full shadow -left-1 -top-1 transition ${field.value ? 'translate-x-full bg-indigo-600' : 'bg-gray-400'}`}></div>
-                    </div>
-                    <span className="ml-3 text-gray-500">Marque se este for um aparelho favorito</span>
-                  </label>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           <Button
             type="submit"
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300"
             disabled={loading}
           >
-            {loading ? 'Enviando...' : 'Cadastrar Aparelho'}
+            {loading ? 'Enviando...' : aparelhoId ? 'Atualizar Aparelho' : 'Cadastrar Aparelho'}
           </Button>
 
           {/* Feedback de sucesso ou erro */}
-          {success && <p className="text-green-600 mt-4">{success}</p>}
-          {error && <p className="text-red-600 mt-4">{error}</p>}
+          {success && <p className="text-green-600 mt-4 text-center">{success}</p>}
+          {error && <p className="text-red-600 mt-4 text-center">{error}</p>}
         </form>
       </Form>
     </div>
   );
 }
+
