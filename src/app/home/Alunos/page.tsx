@@ -1,22 +1,11 @@
-"use client";
+"use client"; 
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useQueryGetAllAlunos } from "@/hooks/Pageinicial/useQueryGetAll";
 import Loader from '@/components/Loader';
 import AlunoCard from '@/components/Alunos/AlunoCard/AlunoCard'; // Importe o AlunoCard
 import { useRouter } from 'next/navigation'; 
-
-interface Aluno {
-    id: string;
-    foto: string;
-    nome: string;
-    tipo: string;
-    email: string;
-    telefone: string;
-    dataNascimento: string;
-    statusPagamento: string;
-    ativo: boolean;
-}
+import { Aluno } from '@/components/Alunos/Interface/iAluno';
 
 export default function Alunos() {
     const router = useRouter();
@@ -45,20 +34,19 @@ export default function Alunos() {
         <div>
             {/* Botão de adicionar aluno fixo ou posicionado no layout */}
             <div className="fixed top-4 right-4">
-    <Button onClick={handleAddAluno} className="mt-4 bg-black text-white">Adicionar Aluno</Button>
-</div>
+                <Button onClick={handleAddAluno} className="mt-4 bg-black text-white">
+                    Adicionar Aluno
+                </Button>
+            </div>
 
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">
                 {Array.isArray(data) && data.length > 0 ? (
                     data.map((aluno) => (
-                        //@ts-ignore
                         <AlunoCard 
-                        key={aluno.id} 
-                        {...aluno} 
-                        onClick={() => {
-                            //@ts-ignore
-                            setSelectedAluno(aluno);
+                            key={aluno.id} 
+                            aluno={aluno} 
+                            onClick={() => {
+                                setSelectedAluno(aluno);
                                 setModalVisible(true);
                             }}
                         />
@@ -69,6 +57,29 @@ export default function Alunos() {
                     </div>
                 )}
             </div>
+
+            {/* Modal para exibir detalhes do aluno */}
+            {modalVisible && selectedAluno && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white p-6 rounded-lg w-11/12 md:w-2/3 lg:w-1/2">
+                        <h2 className="text-2xl font-bold mb-4">{selectedAluno.nome}</h2>
+                        <img 
+                            src={selectedAluno.fotoBase64} 
+                            alt={`${selectedAluno.nome} foto`} 
+                            className="w-32 h-32 object-cover rounded-full mb-4"
+                        />
+                        <p><strong>Email:</strong> {selectedAluno.email}</p>
+                        <p><strong>Telefone:</strong> {selectedAluno.telefone}</p>
+                        <p><strong>Data de Nascimento:</strong> {new Date(selectedAluno.dataNascimento).toLocaleDateString()}</p>
+                        <p><strong>Objetivos:</strong> {selectedAluno.objetivos}</p>
+                        <p><strong>Status:</strong> {selectedAluno.ativo ? 'Ativo' : 'Inativo'}</p>
+                        {/* Adicione mais detalhes conforme necessário */}
+                        <Button onClick={() => setModalVisible(false)} className="mt-4">
+                            Fechar
+                        </Button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

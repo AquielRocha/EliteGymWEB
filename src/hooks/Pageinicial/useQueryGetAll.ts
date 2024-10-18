@@ -1,60 +1,30 @@
+// hooks/Pageinicial/useQueryGetAll.ts
 import api from "@/api/axios";
 import { useQuery } from "@tanstack/react-query";
+import { Aluno } from "@/components/Alunos/Interface/iAluno";
 
-
-
-export interface Endereco {
-  rua: string;
-  numero: string;
-  complemento?: string;
-  bairro: string;
-  cidade: string;
-  estado: string;
-  codigoPostal: string;
-  pais: string;
-}
-
-export interface Aluno {
-  id: number;
-  nome: string;
-  email: string;
-  foto: string;
-  tipo: string;
-  dataNascimento: string; // ou Date se preferir
-  telefone: string;
-  objetivos: string;
-  tipoPlano: string;
-  statusPagamento: string;
-  informacoesMedicas?: string;
-  preferenciasTreino: string;
-  aulas: number;
-  ativo: boolean;
-  enderecosJoin: Endereco[];
-}
-async function getAllAlunos() {
+async function getAllAlunos(): Promise<Aluno[]> {
   try {
-    const response = await api.get("Alunos/GetAll");
-    console.log("Resposta da API:", response);
+    const response = await api.get("/Alunos/GetAll");
+    console.log("Resposta da API:", response.data);
 
-    // Acessa diretamente response.data se for um array
-    if (response.data && Array.isArray(response.data)) {
-      return response.data as Aluno[]; // Retorna o array de alunos
+    // Verifica se response.data é um array
+    if (Array.isArray(response.data)) {
+      return response.data as Aluno[];
     } else {
-      console.error("Dados dos alunos não encontrados");
-      return []; // Retorna um array vazio em caso de erro
+      console.error("Dados dos alunos não encontrados ou formato inesperado.");
+      return [];
     }
   } catch (error) {
     console.error("Erro ao buscar alunos:", error);
-    return []; // Retorna um array vazio em caso de erro
+    throw new Error("Erro ao buscar alunos");
   }
 }
 
-
-
 export function useQueryGetAllAlunos() {
-  return useQuery({
+  return useQuery<Aluno[], Error>({
     queryKey: ["Alunos", "alunos"],
-    queryFn: getAllAlunos, 
+    queryFn: getAllAlunos,
+    staleTime: 1000 * 60 * 5, 
   });
 }
-
