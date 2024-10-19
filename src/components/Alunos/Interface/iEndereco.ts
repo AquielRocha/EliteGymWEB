@@ -1,4 +1,3 @@
-// src/interfaces/Endereco.ts
 
 export interface Endereco {
     id: number;

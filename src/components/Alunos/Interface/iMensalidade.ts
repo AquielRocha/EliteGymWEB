@@ -1,4 +1,3 @@
-// src/interfaces/Mensalidade.ts
 
 export interface Mensalidade {
     id: number;

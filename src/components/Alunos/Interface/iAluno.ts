@@ -15,5 +15,4 @@ export interface Aluno {
   ativo: boolean;
   enderecos: Endereco[]; // Lista de endereços
   mensalidades: Mensalidade[]; // Lista de mensalidades
-  // Adicione outros campos conforme necessário
 }

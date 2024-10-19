@@ -6,6 +6,7 @@ import Loader from '@/components/Loader';
 import AlunoCard from '@/components/Alunos/AlunoCard/AlunoCard'; // Importe o AlunoCard
 import { useRouter } from 'next/navigation'; 
 import { Aluno } from '@/components/Alunos/Interface/iAluno';
+import AddAluno from './AddAluno/page';
 
 export default function Alunos() {
     const router = useRouter();
@@ -33,11 +34,14 @@ export default function Alunos() {
     return (
         <div>
             {/* Botão de adicionar aluno fixo ou posicionado no layout */}
-            <div className="fixed top-4 right-4">
-                <Button onClick={handleAddAluno} className="mt-4 bg-black text-white">
-                    Adicionar Aluno
-                </Button>
-            </div>
+            <div className="flex justify-between items-center mb-6 ">
+       
+        <Button onClick={handleAddAluno} className="ml-4 bg-black text-white">
+        Adicionar Aparelho
+        </Button>
+
+      </div>
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">
                 {Array.isArray(data) && data.length > 0 ? (
