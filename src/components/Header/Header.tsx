@@ -15,7 +15,7 @@ export default function Header() {
     { name: 'Home', href: '/home' },
     { name: 'Alunos - Professores', href: '/home/Alunos' },
     { name: 'Aulas', href: '/home/Aulas' },
-    { name: 'Aparelhos', href: '/Aparelhos' },
+    { name: 'Aparelhos', href: '/home/Aparelhos' },
     { name: 'Opções', href: '/Settings' },
   ]
 
