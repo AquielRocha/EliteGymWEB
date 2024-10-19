@@ -1,44 +1,19 @@
-"use client";
-import React from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
-import localFont from "next/font/local";
-import Planofundo from "../../public/background.png";
-import "./globals.css";
-import { ContextWrapper } from "@/contexts/ContextWrapper"; // Ajuste o caminho conforme necessário
+import { Roboto } from 'next/font/google';
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+// Carregar a fonte Roboto do Google Fonts
+const roboto = Roboto({
+  subsets: ['latin'],  // Define quais caracteres você precisa
+  weight: ['400', '700'],  // Define os pesos que você quer usar (normal e bold, por exemplo)
+  variable: '--font-roboto',  // Nome da variável CSS que será usada
 });
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const [queryClient] = useState(() => new QueryClient());
-
+export default function RootLayout({ children }) {
   return (
-    <html lang="pt-br">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        style={{
-          backgroundImage: `url(${Planofundo.src})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          height: "100vh",
-        }}
-      >
-        <ContextWrapper>
-          {children}
-        </ContextWrapper>
+    <html lang="en">
+      <head />
+      </head>
+      <body className={roboto.variable}> {/* Aplica a fonte no body */}
+        {children}
       </body>
     </html>
   );
