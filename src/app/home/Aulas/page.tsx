@@ -2,19 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { useQueryGetAllAulas } from "@/hooks/Pageinicial/useQueryGetAllAulas";
+import { useQueryGetAllAulas } from "@/hooks/Pageinicial/useQueryGetAllAulas"; // Hook para buscar aulas
 import Loader from '@/components/Loader';
-import AulaCard from '@/components/Aulas/AulaCard/AulaCard';
-import AulaModal from '@/components/Modal/AulaModal';
+import AulaCard from '@/components/Aulas/AulaCard/AulaCard';  // Componente de card para aulas
+import AulaModal from '@/components/Modal/AulaModal'; // Modal para gerenciamento de aulas
 import { useRouter } from 'next/navigation';
-import api from '@/api/axios';
+import api from '@/api/axios';  // Certifique-se de importar a API corretamente
 
+// Atualizando a interface Aula para incluir o campo `video`
 interface Aula {
   id: number;
   nome: string;
   descricao: string;
   foto: string;
-  video: string;
+  video: string;  // Incluindo o campo `video`
   tipo: string;
   data: string;
   horario: string;
@@ -30,7 +31,7 @@ const tiposDeAula = [
 
 export default function Aulas() {
   const router = useRouter();
-  const { data, error, isLoading, refetch } = useQueryGetAllAulas();
+  const { data, error, isLoading, refetch } = useQueryGetAllAulas();  // Hook para pegar todas as aulas
 
   const [searchTerm, setSearchTerm] = useState<string>(''); 
   const [tipoFiltro, setTipoFiltro] = useState<string>('todos');
@@ -38,6 +39,7 @@ export default function Aulas() {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [selectedAula, setSelectedAula] = useState<Aula | null>(null);
 
+  // Filtro e busca nas aulas
   useEffect(() => {
     if (data) {
       const filtered = data.filter((aula: Aula) => {
@@ -50,25 +52,22 @@ export default function Aulas() {
     }
   }, [data, searchTerm, tipoFiltro]);
 
+  // Adicionar nova aula
   const handleAddAula = () => {
-    router.push('/home/Aulas/AddAula');
+    router.push('/Aulas/AddAula');
   };
 
+  // Excluir aula
   const handleDeleteAula = async () => {
     if (!selectedAula) return;
 
     try {
       await api.delete(`/aulas/del/${selectedAula.id}`);
-      refetch();
-      setModalVisible(false);
+      refetch();  // Recarrega a lista de aulas após exclusão
+      setModalVisible(false);  // Fecha o modal
     } catch (error) {
       console.error('Erro ao excluir a aula:', error);
     }
-  };
-
-  const handleManageAula = (aula: Aula) => {
-    setSelectedAula(aula);
-    setModalVisible(true);
   };
 
   if (isLoading) {
@@ -127,12 +126,17 @@ export default function Aulas() {
               nome={aula.nome}
               descricao={aula.descricao}
               foto={aula.foto}
-              video={aula.video}
+              video={aula.video}  // Adicionando o campo `video`
               tipo={aula.tipo}
               data={aula.data}
               horario={aula.horario}
-              onClick={() => handleManageAula(aula)}
-              onManageClick={() => handleManageAula(aula)}
+              onClick={() => {
+                setSelectedAula(aula);
+                setModalVisible(true);
+              }}
+              onManageClick={() => {
+                console.log(`Gerenciar aula ${aula.nome}`); // Exemplo de função para gerenciar a aula
+              }}
             />
           ))          
         ) : (

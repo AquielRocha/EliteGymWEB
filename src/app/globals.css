@@ -129,16 +129,3 @@
   color: red;
   margin-bottom: 10px;
 }
-
-.embla {
-  overflow: hidden;
-}
-
-.embla__container {
-  display: flex;
-}
-
-.embla__slide {
-  min-width: 100%;
-  position: relative;
-}
