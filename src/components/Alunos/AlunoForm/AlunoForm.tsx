@@ -1,30 +1,29 @@
 'use client'
 
-import { z } from 'zod'
-import { useForm, Controller, useFieldArray } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import InputMask from 'react-input-mask'
-import { useState } from 'react'
+import { z } from 'zod';
+import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import InputMask from 'react-input-mask';
+import { useState } from 'react';
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
-  SelectGroup,
-  SelectLabel,
   SelectItem,
-} from '@/components/ui/select'
-import { useQueryGetAllPlanos } from '@/hooks/Alunos/UseQueryGetAllPlanos'
-import { iPlanos } from '../Interface/iPlanos'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { MapPin, Plus, Trash2 } from 'lucide-react'
+} from '@/components/ui/select';
+import { useQueryGetAllPlanos } from '@/hooks/Alunos/UseQueryGetAllPlanos';
+import { iPlanos } from '../Interface/iPlanos';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Plus, Trash2 } from 'lucide-react';
+import useMutationAddAlunos, { CreateAlunoComEnderecosDto } from '@/hooks/Alunos/Mutation/UseMutationAddAlunos';
 
 const alunoSchema = z.object({
   tipo: z.string().min(1, 'Tipo de usuário é obrigatório'),
@@ -47,9 +46,9 @@ const alunoSchema = z.object({
       pais: z.string().min(1, 'País é obrigatório'),
     })
   ),
-})
+});
 
-type AlunoFormValues = z.infer<typeof alunoSchema>
+type AlunoFormValues = z.infer<typeof alunoSchema>;
 
 export default function EnhancedAlunoForm() {
   const form = useForm<AlunoFormValues>({
@@ -76,40 +75,69 @@ export default function EnhancedAlunoForm() {
         },
       ],
     },
-  })
+  });
 
-  const { control, handleSubmit, setValue, watch } = form
+  const { control, handleSubmit, setValue, reset } = form;
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'enderecos',
-  })
+  });
 
-  const { data: planos, isLoading, error, refetch } = useQueryGetAllPlanos()
-  const [fotoBase64, setFotoBase64] = useState('')
-
+  const { data: planos, isLoading, error, refetch } = useQueryGetAllPlanos();
+  const [fotoBase64, setFotoBase64] = useState('');
   const onSubmit = async (data: AlunoFormValues) => {
-    const formattedData = {
-      ...data,
-      foto: fotoBase64,
+    try {
+      const dataNascimentoUTC = new Date(data.dataNascimento);  // Converte para objeto Date
+      const alunoData: CreateAlunoComEnderecosDto = {
+        Nome: data.nome,
+        Email: data.email,
+        Foto: fotoBase64,
+        Tipo: data.tipo,
+        DataNascimento: dataNascimentoUTC.toISOString(),  // Converte para string ISO em UTC
+        Telefone: data.telefone,
+        Objetivos: data.objetivos,
+        Ativo: true,
+        PlanoId: data.planoId,
+        Enderecos: data.enderecos.map((endereco) => ({
+          Rua: endereco.rua,
+          Numero: endereco.numero,
+          Complemento: endereco.complemento || '',
+          Bairro: endereco.bairro,
+          Cidade: endereco.cidade,
+          Estado: endereco.estado,
+          CodigoPostal: endereco.codigoPostal,
+          Pais: endereco.pais,
+        })),
+      };
+  
+      // Chama a mutação para adicionar o aluno
+      const response = await useMutationAddAlunos(alunoData);
+      console.log('Aluno cadastrado com sucesso:', response);
+  
+      // Reseta o formulário após sucesso
+      reset();
+      setFotoBase64('');
+    } catch (error) {
+      console.error('Erro ao cadastrar aluno:', error);
     }
-    console.log('Dados enviados ao backend:', formattedData)
-  }
+  };
+  
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onloadend = () => {
-        const base64String = reader.result as string
-        setFotoBase64(base64String)
-        setValue('foto', base64String)
-      }
-      reader.readAsDataURL(file)
+        const base64String = reader.result as string;
+        setFotoBase64(base64String);
+        setValue('foto', base64String);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   if (isLoading) {
-    return <div className="text-center p-8">Carregando planos...</div>
+    return <div className="text-center p-8">Carregando planos...</div>;
   }
 
   if (error) {
@@ -118,7 +146,7 @@ export default function EnhancedAlunoForm() {
         <p className="text-red-500 mb-4">Erro ao carregar planos.</p>
         <Button onClick={() => refetch()}>Tentar novamente</Button>
       </div>
-    )
+    );
   }
 
   return (
@@ -376,7 +404,7 @@ export default function EnhancedAlunoForm() {
                             <FormField
                               control={control}
                               name={`enderecos.${index}.estado`}
-                              render={({ field }) =>   (
+                              render={({ field }) => (
                                 <FormItem>
                                   <FormLabel>Estado</FormLabel>
                                   <FormControl>
@@ -422,16 +450,18 @@ export default function EnhancedAlunoForm() {
                     variant="outline"
                     size="sm"
                     className="mt-2"
-                    onClick={() => append({
-                      rua: '',
-                      numero: '',
-                      complemento: '',
-                      bairro: '',
-                      cidade: '',
-                      estado: '',
-                      codigoPostal: '',
-                      pais: '',
-                    })}
+                    onClick={() =>
+                      append({
+                        rua: '',
+                        numero: '',
+                        complemento: '',
+                        bairro: '',
+                        cidade: '',
+                        estado: '',
+                        codigoPostal: '',
+                        pais: '',
+                      })
+                    }
                   >
                     <Plus className="mr-2 h-4 w-4" /> Adicionar Endereço
                   </Button>
@@ -445,5 +475,5 @@ export default function EnhancedAlunoForm() {
         </Button>
       </form>
     </Form>
-  )
+  );
 }
