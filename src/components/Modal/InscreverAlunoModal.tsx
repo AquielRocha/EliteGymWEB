@@ -1,100 +1,101 @@
-import { useState, useEffect } from 'react';
+import { useQueryGetAllAlunos } from '@/hooks/Pageinicial/useQueryGetAll'; // Ajuste o caminho conforme necessário
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Aluno } from '@/components/Alunos/Interface/iAluno';
-import axios from 'axios';
+import AlunoCard from '@/components/Alunos/AlunoCard/AlunoCard';
+import api from '@/api/axios';  // Certifique-se de que o caminho da instância axios está correto
 
-// Props para o modal de inscrição
 interface InscreverAlunoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  aulaId: number; // ID da aula para inscrever o aluno
+  aulaId: number;
 }
 
 export const InscreverAlunoModal: React.FC<InscreverAlunoModalProps> = ({ isOpen, onClose, aulaId }) => {
-  const [alunos, setAlunos] = useState<Aluno[]>([]); // Alunos da API
-  const [selectedAluno, setSelectedAluno] = useState<Aluno | null>(null); // Aluno selecionado
+  const [selectedAluno, setSelectedAluno] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (isOpen) {
-      // Buscar alunos quando o modal abrir
-      axios.get('/api/Alunos/GetAll')
-        .then((response) => {
-          setAlunos(response.data);
-        })
-        .catch((error) => {
-          console.error('Erro ao buscar alunos:', error);
-        });
-    }
-  }, [isOpen]);
+  const { data: alunos, isLoading, isError, error } = useQueryGetAllAlunos();
 
-  // Função para inscrever o aluno selecionado
   const handleInscrever = () => {
     if (!selectedAluno) {
       alert("Por favor, selecione um aluno.");
       return;
     }
-
-    // Fazer a requisição de inscrição do aluno na aula
-    axios.post(`/api/Aulas/inscrever`, { alunoId: selectedAluno.id, aulaId })
-      .then((response) => {
-        alert(`Aluno ${selectedAluno.nome} inscrito com sucesso!`);
-        onClose(); // Fechar o modal após a inscrição
-      })
-      .catch((error) => {
-        console.error('Erro ao inscrever aluno:', error);
-        alert('Erro ao inscrever aluno. Tente novamente.');
-      });
+  
+    // Corrigindo a URL para evitar duplicação de '/api'
+    const apiUrl = `/Aulas/inscrever`;  // Remova o '/api' extra
+  
+    const queryParams = {
+      aulaId: aulaId,
+      alunoId: selectedAluno,
+    };
+  
+    // Log para verificar a URL corrigida
+    console.log('Enviando requisição para:', apiUrl, 'com parâmetros:', queryParams);
+  
+    // Enviando a requisição POST com os parâmetros como query
+    api.post(apiUrl, null, { 
+      params: queryParams
+    })
+    .then(() => {
+      alert("Aluno inscrito com sucesso!");
+      onClose();
+    })
+    .catch((error) => {
+      console.error('Erro ao inscrever aluno:', error);
+      alert('Erro ao inscrever aluno.');
+    });
   };
+  
+  
 
-  if (!isOpen) return null; // Não renderiza o modal se não estiver aberto
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2">
-        <h2 className="text-2xl font-bold mb-4">Inscrever Aluno na Aula</h2>
-        
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"> 
+    <div className="bg-white p-8 rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 z-50">
+      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Inscrever Aluno na Aula</h2>
+
+      {isLoading && <p>Carregando alunos...</p>}
+      {isError && <p className="text-red-500">Erro ao carregar alunos: {error?.message}</p>}
+
+      {alunos && (
         <select
-          className="w-full border border-gray-300 rounded-md p-2 mb-4"
-          onChange={(e) => {
-            const alunoId = Number(e.target.value);
-            const aluno = alunos.find(a => a.id === alunoId) || null;
-            setSelectedAluno(aluno);
-          }}
+          className="w-full border border-gray-300 rounded-lg p-3 mb-6 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200"
+          value={selectedAluno ?? ''} 
+          onChange={(e) => setSelectedAluno(Number(e.target.value))}
         >
-          <option value="" disabled selected>
-            Selecione um aluno
-          </option>
+          <option value="" disabled>Selecione um aluno</option>
           {alunos.map((aluno) => (
             <option key={aluno.id} value={aluno.id}>
               {aluno.id} - {aluno.nome}
             </option>
           ))}
         </select>
+      )}
 
-        {selectedAluno && (
-          <div className="mt-4">
-            <h3 className="text-lg font-bold mb-2">Detalhes do Aluno</h3>
-            <img
-              src={selectedAluno.fotoBase64}
-              alt={`${selectedAluno.nome} foto`}
-              className="w-32 h-32 object-cover rounded-full mb-4"
-            />
-            <p><strong>Nome:</strong> {selectedAluno.nome}</p>
-            <p><strong>Email:</strong> {selectedAluno.email}</p>
-            <p><strong>Telefone:</strong> {selectedAluno.telefone}</p>
-            <p><strong>Data de Nascimento:</strong> {new Date(selectedAluno.dataNascimento).toLocaleDateString()}</p>
-            <p><strong>Objetivos:</strong> {selectedAluno.objetivos}</p>
-            <p><strong>Status:</strong> {selectedAluno.ativo ? 'Ativo' : 'Inativo'}</p>
-            <p><strong>Endereço:</strong> {selectedAluno.enderecos[0]?.rua}, {selectedAluno.enderecos[0]?.numero}, {selectedAluno.enderecos[0]?.bairro}, {selectedAluno.enderecos[0]?.cidade} - {selectedAluno.enderecos[0]?.estado}</p>
-            <p><strong>Mensalidade Pendente:</strong> {selectedAluno.mensalidades[0]?.status === 'Pendente' ? 'Sim' : 'Não'}</p>
-          </div>
-        )}
+      {selectedAluno && alunos && (
+        <AlunoCard
+          aluno={alunos.find(aluno => aluno.id === selectedAluno)!}
+          onClick={() => setSelectedAluno(selectedAluno)}
+        />
+      )}
 
-        <div className="flex justify-end mt-6">
-          <Button onClick={onClose} className="mr-2">Cancelar</Button>
-          <Button onClick={handleInscrever} className="bg-green-600 text-white">Inscrever</Button>
-        </div>
+      <div className="flex justify-center mt-6">
+      <Button
+        onClick={onClose}
+        className="mr-2 border border-gray-400 text-gray-600 bg-white hover:bg-gray-100 hover:text-gray-700 transition duration-200"
+      >
+        Cancelar
+      </Button>
+        <Button 
+          onClick={handleInscrever} 
+          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200"
+        >
+          Inscrever
+        </Button>
       </div>
     </div>
+  </div>
+
   );
 };

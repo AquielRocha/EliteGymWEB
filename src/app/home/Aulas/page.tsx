@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
@@ -8,22 +8,23 @@ import AulaCard from '@/components/Aulas/AulaCard/AulaCard';  // Componente de c
 import AulaModal from '@/components/Modal/AulaModal'; // Modal para gerenciamento de aulas
 import { useRouter } from 'next/navigation';
 import api from '@/api/axios';  // Certifique-se de importar a API corretamente
+import { Aluno } from '@/components/Alunos/Interface/iAluno';  // Importando o tipo Aluno correto
 
-// Atualizando a interface Aula para incluir o campo `video`
 interface Aula {
   id: number;
   nome: string;
   descricao: string;
   foto: string;
-  video: string;  // Incluindo o campo `video`
+  video?: string;  // Incluindo o campo `video` como opcional
   tipo: string;
   data: string;
   horario: string;
   numeroVagas: number;
+  alunosInscritos?: Aluno[];  // Alunos inscritos pode ser opcional
 }
 
 const tiposDeAula = [
-  { label: "Todos", value: "" },
+  { label: "Todos", value: "todos" },
   { label: "Online", value: "online" },
   { label: "Presencial", value: "presencial" },
   { label: "Gravado", value: "gravado" },
@@ -31,7 +32,7 @@ const tiposDeAula = [
 
 export default function Aulas() {
   const router = useRouter();
-  const { data, error, isLoading, refetch } = useQueryGetAllAulas();  // Hook para pegar todas as aulas
+  const { data, error, isLoading, refetch } = useQueryGetAllAulas();
 
   const [searchTerm, setSearchTerm] = useState<string>(''); 
   const [tipoFiltro, setTipoFiltro] = useState<string>('todos');
@@ -54,7 +55,7 @@ export default function Aulas() {
 
   // Adicionar nova aula
   const handleAddAula = () => {
-    router.push('/Aulas/AddAula');
+    router.push('/home/Aulas/AddAula');
   };
 
   // Excluir aula
@@ -99,13 +100,7 @@ export default function Aulas() {
       </div>
 
       <div className="flex justify-center space-x-4 mb-6">
-        <Button 
-          className={`${tipoFiltro === 'todos' ? 'bg-blue-500 text-white' : 'bg-white text-blue-500 border border-blue-500'}`} 
-          onClick={() => setTipoFiltro('todos')}
-        >
-          Todos
-        </Button>
-
+        {/* Filtros de tipo de aula */}
         {tiposDeAula.map((tipo) => (
           <Button 
             key={tipo.value}
@@ -122,20 +117,14 @@ export default function Aulas() {
           filteredAulas.map((aula: Aula) => (
             <AulaCard
               key={aula.id}
-              id={aula.id}
-              nome={aula.nome}
-              descricao={aula.descricao}
-              foto={aula.foto}
-              video={aula.video}  // Adicionando o campo `video`
-              tipo={aula.tipo}
-              data={aula.data}
-              horario={aula.horario}
+              aula={aula}  // Passando o objeto `aula`
               onClick={() => {
                 setSelectedAula(aula);
                 setModalVisible(true);
               }}
               onManageClick={() => {
-                console.log(`Gerenciar aula ${aula.nome}`); // Exemplo de função para gerenciar a aula
+                setSelectedAula(aula);
+                setModalVisible(true);
               }}
             />
           ))          
@@ -146,9 +135,10 @@ export default function Aulas() {
         )}
       </div>
 
+      {/* Modal de gerenciamento da aula */}
       {modalVisible && selectedAula && (
         <AulaModal
-          aula={selectedAula}
+          aula={selectedAula}  // Passa o objeto `selectedAula`
           onClose={() => setModalVisible(false)}
           onDelete={handleDeleteAula}
         />

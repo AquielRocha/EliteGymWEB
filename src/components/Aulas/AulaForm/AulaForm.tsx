@@ -58,8 +58,14 @@ export default function AulaForm() {
       if (aulaId) {
         setLoading(true);
         try {
-          const { data } = await api.get(`/Aulas/GET${aulaId}`);
-          form.reset(data);  // Preenche o formulário com os dados da aula para edição
+          const { data } = await api.get(`/Aulas/GET/${aulaId}`);
+          
+          const formattedData = {
+            ...data,
+            data: data.data.split('T')[0], 
+          };
+          
+          form.reset(formattedData);
         } catch (err) {
           setError('Erro ao carregar a aula. Tente novamente.');
         } finally {
