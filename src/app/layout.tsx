@@ -5,6 +5,8 @@ import localFont from "next/font/local";
 import Planofundo from "../../public/background.png";
 import "./globals.css";
 import { ContextWrapper } from "@/contexts/ContextWrapper";
+import { Toaster } from "@/components/ui/toaster";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 // Carregue apenas a fonte que você quer
 const geistSans = localFont({
@@ -30,10 +32,15 @@ export default function RootLayout({
           backgroundPosition: "center",
           height: "100vh",
         }}
-      >
+      >    <AuthProvider>
+
         <QueryClientProvider client={queryClient}>
           <ContextWrapper>{children}</ContextWrapper>
         </QueryClientProvider>
+        <Toaster />
+        </AuthProvider>
+
+
       </body>
     </html>
   );
