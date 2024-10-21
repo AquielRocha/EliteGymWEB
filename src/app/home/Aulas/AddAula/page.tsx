@@ -1,6 +1,6 @@
 'use client';
 
-import AulaForm from '@/components/Aulas/AulaForm/AulaForm';  // Importa o componente de formulário
+import AulaForm from '@/components/Aulas/AulaForm/AulaForm';
 
 export default function AddAulas() {
   return (

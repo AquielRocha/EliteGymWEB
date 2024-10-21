@@ -4,19 +4,19 @@ import { Settings, UserPlus } from "lucide-react";
 import { InscreverAlunoModal } from '@/components/Modal/InscreverAlunoModal';
 import AulaModal from '@/components/Modal/AulaModal';
 import api from '@/api/axios';
-import { Aluno } from '@/components/Alunos/Interface/iAluno';  // Importando o tipo Aluno atualizado
+import { Aluno } from '@/components/Alunos/Interface/iAluno';
 
 interface Aula {
   id: number;
   nome: string;
   descricao: string;
   foto: string;
-  video?: string;  // O vídeo agora é opcional
+  video?: string;
   tipo: string;
   data: string;
   horario: string;
   numeroVagas: number;
-  alunosInscritos?: Aluno[];  // Agora alunosInscritos é opcional
+  alunosInscritos?: Aluno[];
 }
 
 interface AulaCardProps {
@@ -39,19 +39,19 @@ const AulaCard: React.FC<AulaCardProps> = ({ aula, onClick, onManageClick, class
       const response = await api.get(`/Aulas/GET/${aulaId}`);
       setAulaCompleta(response.data);
       console.log("Dados da aula carregados:", response.data);
-      return true;  // Retorna true se os dados forem buscados com sucesso
+      return true;
     } catch (error) {
       console.error("Erro ao buscar dados da aula:", error);
-      return false;  // Retorna false se houver erro
+      return false;
     }
   };
 
   const handleOpenManageModal = async () => {
     console.log("Clicado para gerenciar aula...");
-    const success = await fetchAulaCompleta(id);  // Busca os dados completos antes de abrir o modal
+    const success = await fetchAulaCompleta(id);
     if (success) {
       console.log("Abrindo modal de gerenciamento...");
-      setIsAulaModalOpen(true);  // Abre o modal somente se os dados forem buscados com sucesso
+      setIsAulaModalOpen(true);
     }
   };
 
@@ -89,7 +89,7 @@ const AulaCard: React.FC<AulaCardProps> = ({ aula, onClick, onManageClick, class
             className="flex items-center gap-2 text-indigo-600 font-semibold"
             onClick={(event) => {
               event.stopPropagation();
-              handleOpenManageModal();  // Busca os dados completos e abre o modal
+              handleOpenManageModal();
             }}
           >
             <Settings className="w-4 h-4" />
@@ -119,13 +119,12 @@ const AulaCard: React.FC<AulaCardProps> = ({ aula, onClick, onManageClick, class
       {/* Modal de Gerenciamento da Aula */}
       {isAulaModalOpen && aulaCompleta && (
         <AulaModal
-          aula={aulaCompleta}  // Agora passamos o objeto completo
+          aula={aulaCompleta}
           onClose={() => {
             console.log("Fechando modal de gerenciamento...");
             setIsAulaModalOpen(false);
           }}
           onDelete={() => {
-            // Lógica para deletar a aula
           }}
         />
       )}

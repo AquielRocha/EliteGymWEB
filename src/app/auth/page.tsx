@@ -27,7 +27,7 @@ export default function Component() {
       const token = await userCredential.user.getIdToken();
   
       // Salva o token no cookie
-      document.cookie = `token=${token}; path=/; max-age=3600`; // Expira em 1 hora
+      document.cookie = `token=${token}; path=/; max-age=3600`;
   
       toast({
         title: "Login bem-sucedido!",
@@ -38,7 +38,7 @@ export default function Component() {
   
       setTimeout(() => {
         router.push('/home');
-      }, 3000); // Redirecionamento após 3 segundos
+      }, 3000);
     } catch (error) {
       toast({
         title: "Erro no login",
@@ -52,7 +52,6 @@ export default function Component() {
   const handleRegister = async (e: any) => {
     e.preventDefault();
 
-    // Validação de senha e confirmação de senha
     if (password !== confirmPassword) {
       toast({
         title: "Erro no cadastro",
@@ -68,11 +67,11 @@ export default function Component() {
         title: "Cadastro bem-sucedido!",
         description: "Você será redirecionado para a página inicial.",
         variant: "default",
-        duration: 3000, // Duração de 3 segundos
+        duration: 3000,
       });
       setTimeout(() => {
         router.push('/home');
-      }, 3000); // Redirecionamento após 3 segundos
+      }, 3000);
     } catch (error) {
       toast({
         title: "Erro no cadastro",

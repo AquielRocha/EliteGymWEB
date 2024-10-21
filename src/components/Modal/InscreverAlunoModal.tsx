@@ -1,8 +1,8 @@
-import { useQueryGetAllAlunos } from '@/hooks/Pageinicial/useQueryGetAll'; // Ajuste o caminho conforme necessário
+import { useQueryGetAllAlunos } from '@/hooks/Pageinicial/useQueryGetAll';
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import AlunoCard from '@/components/Alunos/AlunoCard/AlunoCard';
-import api from '@/api/axios';  // Certifique-se de que o caminho da instância axios está correto
+import api from '@/api/axios';
 
 interface InscreverAlunoModalProps {
   isOpen: boolean;
@@ -20,19 +20,15 @@ export const InscreverAlunoModal: React.FC<InscreverAlunoModalProps> = ({ isOpen
       alert("Por favor, selecione um aluno.");
       return;
     }
-  
-    // Corrigindo a URL para evitar duplicação de '/api'
-    const apiUrl = `/Aulas/inscrever`;  // Remova o '/api' extra
+    const apiUrl = `/Aulas/inscrever`;
   
     const queryParams = {
       aulaId: aulaId,
       alunoId: selectedAluno,
     };
   
-    // Log para verificar a URL corrigida
     console.log('Enviando requisição para:', apiUrl, 'com parâmetros:', queryParams);
   
-    // Enviando a requisição POST com os parâmetros como query
     api.post(apiUrl, null, { 
       params: queryParams
     })

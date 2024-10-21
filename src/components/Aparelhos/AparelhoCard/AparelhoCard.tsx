@@ -74,7 +74,7 @@ const AparelhoCard: React.FC<AparelhoCardProps> = ({
           className="flex items-center gap-2 text-indigo-600 font-semibold"
           onClick={(event) => {
             event.stopPropagation(); 
-            onManageClick(); // Agora abre o modal
+            onManageClick();
           }}
         >
           <Settings className="w-4 h-4" />

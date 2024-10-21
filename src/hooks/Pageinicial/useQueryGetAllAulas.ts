@@ -19,7 +19,7 @@ async function getAllAulas() {
     if (response.data && Array.isArray(response.data)) {
       return response.data.map((aula: any) => ({
         ...aula,
-        video: aula.video || "",  // Certifique-se de que `video` esteja presente, mesmo se for vazio
+        video: aula.video || "",
       })) as Aula[];
     } else {
       return [];

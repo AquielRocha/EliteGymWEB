@@ -1,7 +1,7 @@
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { FaTrash, FaEdit } from 'react-icons/fa'; // Ícones para edição e exclusão
-import { Aluno } from '@/components/Alunos/Interface/iAluno';  // Importando o tipo Aluno atualizado
+import { FaTrash, FaEdit } from 'react-icons/fa';
+import { Aluno } from '@/components/Alunos/Interface/iAluno';
 
 interface Aula {
   id: number;
@@ -25,7 +25,6 @@ interface AulaModalProps {
 const AulaModal: React.FC<AulaModalProps> = ({ aula, onClose, onDelete }) => {
   const router = useRouter();
 
-  // Calcula o número de vagas restantes
   const vagasRestantes = aula.numeroVagas - (aula.alunosInscritos?.length || 0);
 
   return (
@@ -51,14 +50,14 @@ const AulaModal: React.FC<AulaModalProps> = ({ aula, onClose, onDelete }) => {
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-gray-800">Alunos Inscritos:</h3>
           {aula.alunosInscritos && aula.alunosInscritos.length > 0 ? (
-            <ul className="mt-2 space-y-2"> {/* Adicionando espaçamento entre os itens */}
+            <ul className="mt-2 space-y-2">
               {aula.alunosInscritos.map((aluno) => (
                 <li key={aluno.id} className="border-b py-2 flex items-center">
                   <div className="flex-shrink-0">
                     <img
-                      src={aluno.fotoBase64}  // Usando o campo fotoBase64 do Aluno
+                      src={aluno.fotoBase64}
                       alt={`${aluno.nome} foto`} 
-                      className="w-12 h-12 object-cover rounded-full border-2 border-gray-300 mr-4" // Ajustando tamanho e estilo da imagem
+                      className="w-12 h-12 object-cover rounded-full border-2 border-gray-300 mr-4"
                     />
                   </div>
                   <div>

@@ -1,45 +1,70 @@
 import React from 'react';
 import { Aluno } from '../Interface/iAluno';
+import { FaEye, FaCog } from 'react-icons/fa'; // Importando ícones
+import AlunoModal from '@/components/Modal/AlunoModal';
 
 interface AlunoCardProps {
-    aluno: Aluno;
-    onClick?: () => void;
+  aluno: Aluno;
+  onView: () => void;
+  onManage: () => void;
 }
 
-const AlunoCard: React.FC<AlunoCardProps> = ({ aluno, onClick }) => {
-    return (
-        <div 
-        className="border rounded-lg p-6 shadow-lg hover:shadow-2xl cursor-pointer transition-transform transform hover:scale-105 duration-300 bg-white"
-        onClick={onClick}
-        >
-        <div className="flex justify-center mb-4">
-            <img 
-            src={aluno.fotoBase64} 
-            alt={`${aluno.nome} foto`} 
-            className="w-28 h-28 object-cover rounded-full border-2 border-gray-300"
-            />
-        </div>
+const AlunoCard: React.FC<AlunoCardProps> = ({ aluno, onView, onManage }) => {
+  return (
+    <div 
+      className="border rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer bg-white overflow-hidden"
+    >
+      {/* Cabeçalho com imagem */}
+      <div className="p-4 flex flex-col items-center">
+        <img 
+          src={aluno.fotoBase64} 
+          alt={`${aluno.nome} foto`} 
+          className="w-24 h-24 object-cover rounded-full border-2 border-gray-300 mb-4"
+        />
+        <h3 className="text-xl font-bold text-gray-800">{aluno.nome}</h3>
+      </div>
 
-        <h3 className="text-2xl font-bold text-center text-gray-800 mb-2">{aluno.nome}</h3>
-
-        <p className="text-center text-gray-600 mb-1">
-            <strong>Email:</strong> {aluno.email}
+      {/* Conteúdo com detalhes */}
+      <div className="px-6 py-4">
+        <p className="text-sm text-gray-600 mb-1">
+          <strong>Email:</strong> {aluno.email}
         </p>
         
-        <p className="text-center text-gray-600 mb-1">
-            <strong>Telefone:</strong> {aluno.telefone}
+        <p className="text-sm text-gray-600 mb-1">
+          <strong>Telefone:</strong> {aluno.telefone}
         </p>
 
-        <p className="text-center text-gray-600 mb-2">
-            <strong>Tipo:</strong> {aluno.tipo}
+        <p className="text-sm text-gray-600 mb-1">
+          <strong>Tipo:</strong> {aluno.tipo}
         </p>
 
-        <p className={`text-center font-semibold mb-2 ${aluno.ativo ? 'text-green-600' : 'text-red-600'}`}>
-            {aluno.ativo ? 'Ativo' : 'Inativo'}
+        <p className={`text-sm font-semibold mb-4 ${aluno.ativo ? 'text-green-600' : 'text-red-600'}`}>
+          {aluno.ativo ? 'Ativo' : 'Inativo'}
         </p>
-        </div>
+      </div>
 
-    );
+      {/* Rodapé com ícones de ação */}
+      <div className="bg-gray-50 border-t border-gray-200 flex justify-between p-4">
+        {/* Botão de visualizar */}
+        <button 
+        className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-semibold"
+        onClick={() => onView()}
+        >
+        <FaEye className="w-4 h-4" />
+        Visualizar
+        </button>
+
+        {/* Botão de gerenciar */}
+        <button 
+          className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-semibold"
+          onClick={onManage}
+        >
+          <FaCog className="w-4 h-4" />
+          Gerenciar
+        </button>
+      </div>
+    </div>
+  );
 }
 
 export default AlunoCard;

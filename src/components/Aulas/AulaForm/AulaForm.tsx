@@ -17,12 +17,12 @@ const tiposDeAulas = [
   { label: "Gravado", value: "gravado" },
 ];
 
-// Validação de formulário usando Zod
+// Validação de formulário Zod
 const aulaSchema = z.object({
     nome: z.string().min(2, 'O nome da aula deve ter pelo menos 2 caracteres'),
     descricao: z.string().optional(),
     foto: z.string().url('A URL da imagem deve ser válida').optional(),
-    video: z.string().url('A URL do vídeo deve ser válida').optional().or(z.literal('')),  // Permitir string vazia
+    video: z.string().url('A URL do vídeo deve ser válida').optional().or(z.literal('')), 
     tipo: z.string().min(1, 'O tipo de aula é obrigatório'),
     data: z.string().min(1, 'A data é obrigatória'),
     horario: z.string().min(1, 'O horário é obrigatório'),
@@ -37,8 +37,8 @@ export default function AulaForm() {
     defaultValues: {
       nome: '',
       descricao: '',
-      foto: '',  // Campo de foto (inicialmente vazio)
-      video: '',  // Campo de vídeo (inicialmente vazio)
+      foto: '',
+      video: '', 
       tipo: '',
       data: '',
       horario: '',
@@ -48,7 +48,7 @@ export default function AulaForm() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const aulaId = searchParams.get('id');  // Obtém o ID da aula a ser editada, se houver
+  const aulaId = searchParams.get('id');  // Obtém o ID da aula no edit
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);

@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { useQueryGetAllAparelhos } from "@/hooks/Pageinicial/useQueryGetAllAparelhos";
 import Loader from '@/components/Loader';
 import AparelhoCard from '@/components/Aparelhos/AparelhoCard/AparelhoCard'; 
-import AparelhoModal from '@/components/Modal/AparelhoModal'; // Modal importado
+import AparelhoModal from '@/components/Modal/AparelhoModal';
 import { useRouter } from 'next/navigation'; 
 import { FaTools, FaHeart, FaDumbbell } from 'react-icons/fa';
-import api from '@/api/axios'; // Certifique-se de importar a API corretamente
+import api from '@/api/axios';
 
 interface Aparelho {
   id: number;
@@ -64,10 +64,9 @@ export default function Aparelhos() {
 
   const handleAddAparelho = (aparelhoId?: number) => {
     if (aparelhoId) {
-      // Redireciona para a rota de edição com o ID do aparelho
+      // Redireciona para edit
       router.push(`/home/Aparelhos/AddAparelho?id=${aparelhoId}`);
     } else {
-      // Redireciona para a rota de adição sem ID
       router.push('/home/Aparelhos/AddAparelho');
     }
   };
@@ -78,8 +77,8 @@ export default function Aparelhos() {
 
     try {
       await api.delete(`/aparelhos/delete/${selectedAparelho.id}`);
-      refetch(); // Recarrega a lista de aparelhos após a exclusão
-      setModalVisible(false); // Fecha o modal
+      refetch();
+      setModalVisible(false);
     } catch (error) {
       console.error('Erro ao excluir o aparelho:', error);
     }
@@ -89,14 +88,12 @@ export default function Aparelhos() {
     if (!selectedAparelho) return;
   
     try {
-      // Alterna o estado de 'manutencao'
       const updatedAparelho = { ...selectedAparelho, manutencao: !selectedAparelho.manutencao };
   
       await api.put(`/aparelhos/${selectedAparelho.id}`, updatedAparelho);
   
-      // Atualiza a lista de aparelhos depois da modificação
       refetch(); 
-      setModalVisible(false); // Fecha o modal
+      setModalVisible(false);
     } catch (error) {
       console.error('Erro ao atualizar o estado de manutenção do aparelho:', error);
     }
@@ -105,13 +102,8 @@ export default function Aparelhos() {
 
   const handleToggleFavorite = async (aparelho: Aparelho) => {
     try {
-      // Alterna o estado de 'favorite'
       const updatedAparelho = { ...aparelho, favorite: !aparelho.favorite };
-  
-      // Chama o PUT para atualizar o aparelho no back-end
       await api.put(`/aparelhos/${aparelho.id}`, updatedAparelho);
-  
-      // Atualiza a lista de aparelhos depois da modificação
       refetch(); 
     } catch (error) {
       console.error('Erro ao atualizar o estado de favorito do aparelho:', error);

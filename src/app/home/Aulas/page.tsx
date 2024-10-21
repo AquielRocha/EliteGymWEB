@@ -2,25 +2,25 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { useQueryGetAllAulas } from "@/hooks/Pageinicial/useQueryGetAllAulas"; // Hook para buscar aulas
+import { useQueryGetAllAulas } from "@/hooks/Pageinicial/useQueryGetAllAulas";
 import Loader from '@/components/Loader';
-import AulaCard from '@/components/Aulas/AulaCard/AulaCard';  // Componente de card para aulas
-import AulaModal from '@/components/Modal/AulaModal'; // Modal para gerenciamento de aulas
+import AulaCard from '@/components/Aulas/AulaCard/AulaCard';
+import AulaModal from '@/components/Modal/AulaModal';
 import { useRouter } from 'next/navigation';
-import api from '@/api/axios';  // Certifique-se de importar a API corretamente
-import { Aluno } from '@/components/Alunos/Interface/iAluno';  // Importando o tipo Aluno correto
+import api from '@/api/axios';
+import { Aluno } from '@/components/Alunos/Interface/iAluno';
 
 interface Aula {
   id: number;
   nome: string;
   descricao: string;
   foto: string;
-  video?: string;  // Incluindo o campo `video` como opcional
+  video?: string;
   tipo: string;
   data: string;
   horario: string;
   numeroVagas: number;
-  alunosInscritos?: Aluno[];  // Alunos inscritos pode ser opcional
+  alunosInscritos?: Aluno[];
 }
 
 const tiposDeAula = [
@@ -117,7 +117,7 @@ export default function Aulas() {
           filteredAulas.map((aula: Aula) => (
             <AulaCard
               key={aula.id}
-              aula={aula}  // Passando o objeto `aula`
+              aula={aula}
               onClick={() => {
                 setSelectedAula(aula);
                 setModalVisible(true);
@@ -138,7 +138,7 @@ export default function Aulas() {
       {/* Modal de gerenciamento da aula */}
       {modalVisible && selectedAula && (
         <AulaModal
-          aula={selectedAula}  // Passa o objeto `selectedAula`
+          aula={selectedAula}
           onClose={() => setModalVisible(false)}
           onDelete={handleDeleteAula}
         />

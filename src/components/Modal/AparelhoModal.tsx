@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { FaTrash, FaEdit, FaWrench } from 'react-icons/fa';
-import { useRouter } from 'next/navigation'; // Importar o router
+import { useRouter } from 'next/navigation';
 
 interface Aparelho {
   id: number;
@@ -28,12 +28,11 @@ const AparelhoModal: React.FC<AparelhoModalProps> = ({
   onToggleManutencao,
 }) => {
   const { register, reset } = useForm<Aparelho>();
-  const router = useRouter(); // Instanciar o router
+  const router = useRouter();
 
-  // Preencher os campos com os dados do aparelho ao abrir o modal
   useEffect(() => {
     if (aparelho) {
-      reset(aparelho); // Reseta os dados do formulário com os dados do aparelho
+      reset(aparelho);
     }
   }, [aparelho, reset]);
 
@@ -54,7 +53,7 @@ const AparelhoModal: React.FC<AparelhoModalProps> = ({
 
         {/* Editar Aparelho */}
         <Button
-          onClick={() => router.push(`/home/Aparelhos/AddAparelho?id=${aparelho.id}`)} // Redireciona para a página de edição com o ID
+          onClick={() => router.push(`/home/Aparelhos/AddAparelho?id=${aparelho.id}`)}
           className="flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white w-full"
         >
           <FaEdit className="w-4 h-4" />
