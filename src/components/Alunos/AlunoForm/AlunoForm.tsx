@@ -130,6 +130,9 @@ export default function EnhancedAlunoForm() {
       // Reseta o formulário após sucesso
       reset();
       setFotoBase64("");
+
+      // Redireciona para a página /home/alunos
+      window.location.href = "/home/Alunos";
     } catch (error) {
       console.error("Erro ao cadastrar aluno:", error);
     }
