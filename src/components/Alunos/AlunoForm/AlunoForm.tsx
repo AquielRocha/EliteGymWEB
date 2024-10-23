@@ -580,12 +580,9 @@ export default function EnhancedAlunoForm() {
           }}
           className="w-full md:w-auto"
         >
-          <Plus className="mr-2 h-4 w-4" /> Adicionar Endereço
+          <Plus className="mr-2 h-4 w-4" /> Adicionar um novo Endereço
         </Button>
 
-        <Button type="submit" className="w-full md:w-auto mt-4 md:mt-0">
-          Salvar Endereços
-        </Button>
       </div>
     </TabsContent>
             </Tabs>

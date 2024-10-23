@@ -174,7 +174,7 @@ export default function Alunos() {
                         <TableBody>
                           {selectedAluno.mensalidades.map((mensalidade, index) => (
                             <TableRow key={index}>
-                              <TableCell>{mensalidade.plano || 'N/A'}</TableCell>
+                              <TableCell>{typeof mensalidade.plano === 'string' ? mensalidade.plano : 'N/A'}</TableCell>
                               <TableCell>R$ {mensalidade.valorMensalidade.toFixed(2)}</TableCell>
                               <TableCell>{new Date(mensalidade.dataVencimento).toLocaleDateString()}</TableCell>
                               <TableCell>
