@@ -1,7 +1,10 @@
-import React from 'react';
-import { Aluno } from '../Interface/iAluno';
-import { FaEye, FaCog } from 'react-icons/fa'; // Importando ícones
-import AlunoModal from '@/components/Modal/AlunoModal';
+import React from 'react'
+import { Aluno } from '../Interface/iAluno'
+import { Eye, Settings } from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 
 interface AlunoCardProps {
   aluno: Aluno;
@@ -9,62 +12,43 @@ interface AlunoCardProps {
   onManage: () => void;
 }
 
-const AlunoCard: React.FC<AlunoCardProps> = ({ aluno, onView, onManage }) => {
+export default function AlunoCard({ aluno, onView, onManage }: AlunoCardProps) {
   return (
-    <div 
-      className="border rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer bg-white overflow-hidden"
-    >
-      {/* Cabeçalho com imagem */}
-      <div className="p-4 flex flex-col items-center">
-        <img 
-          src={aluno.fotoBase64} 
-          alt={`${aluno.nome} foto`} 
-          className="w-24 h-24 object-cover rounded-full border-2 border-gray-300 mb-4"
-        />
-        <h3 className="text-xl font-bold text-gray-800">{aluno.nome}</h3>
-      </div>
-
-      {/* Conteúdo com detalhes */}
-      <div className="px-6 py-4">
-        <p className="text-sm text-gray-600 mb-1">
-          <strong>Email:</strong> {aluno.email}
-        </p>
-        
-        <p className="text-sm text-gray-600 mb-1">
-          <strong>Telefone:</strong> {aluno.telefone}
-        </p>
-
-        <p className="text-sm text-gray-600 mb-1">
-          <strong>Tipo:</strong> {aluno.tipo}
-        </p>
-
-        <p className={`text-sm font-semibold mb-4 ${aluno.ativo ? 'text-green-600' : 'text-red-600'}`}>
+    <Card className="w-full max-w-sm transition-all duration-300 hover:shadow-lg">
+      <CardHeader className="flex flex-col items-center space-y-2 pb-2">
+        <Avatar className="h-24 w-24">
+          <AvatarImage src={aluno.fotoBase64} alt={`${aluno.nome} foto`} />
+          <AvatarFallback>{aluno.nome.charAt(0)}</AvatarFallback>
+        </Avatar>
+        <h3 className="text-xl font-bold">{aluno.nome}</h3>
+        <Badge variant={aluno.ativo ? "default" : "secondary"}>
           {aluno.ativo ? 'Ativo' : 'Inativo'}
-        </p>
-      </div>
-
-      {/* Rodapé com ícones de ação */}
-      <div className="bg-gray-50 border-t border-gray-200 flex justify-between p-4">
-        {/* Botão de visualizar */}
-        <button 
-        className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-semibold"
-        onClick={() => onView()}
-        >
-        <FaEye className="w-4 h-4" />
-        Visualizar
-        </button>
-
-        {/* Botão de gerenciar */}
-        <button 
-          className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-semibold"
-          onClick={onManage}
-        >
-          <FaCog className="w-4 h-4" />
+        </Badge>
+      </CardHeader>
+      <CardContent className="grid gap-2 text-sm">
+        <div className="grid grid-cols-3 items-center">
+          <span className="font-semibold">Email:</span>
+          <span className="col-span-2 truncate">{aluno.email}</span>
+        </div>
+        <div className="grid grid-cols-3 items-center">
+          <span className="font-semibold">Telefone:</span>
+          <span className="col-span-2">{aluno.telefone}</span>
+        </div>
+        <div className="grid grid-cols-3 items-center">
+          <span className="font-semibold">Tipo:</span>
+          <span className="col-span-2">{aluno.tipo}</span>
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-between pt-4">
+        <Button variant="outline" size="sm" onClick={onView}>
+          <Eye className="mr-2 h-4 w-4" />
+          Visualizar
+        </Button>
+        <Button variant="outline" size="sm" onClick={onManage}>
+          <Settings className="mr-2 h-4 w-4" />
           Gerenciar
-        </button>
-      </div>
-    </div>
-  );
+        </Button>
+      </CardFooter>
+    </Card>
+  )
 }
-
-export default AlunoCard;

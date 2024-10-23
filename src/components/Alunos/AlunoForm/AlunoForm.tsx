@@ -1,49 +1,58 @@
-'use client'
+"use client";
 
-import { z } from 'zod';
-import { useForm, Controller, useFieldArray } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import InputMask from 'react-input-mask';
-import { useState } from 'react';
+import { z } from "zod";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import InputMask from "react-input-mask";
+import { useState } from "react";
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
-} from '@/components/ui/select';
-import { useQueryGetAllPlanos } from '@/hooks/Alunos/UseQueryGetAllPlanos';
-import { iPlanos } from '../Interface/iPlanos';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Plus, Trash2 } from 'lucide-react';
-import useMutationAddAlunos, { CreateAlunoComEnderecosDto } from '@/hooks/Alunos/Mutation/UseMutationAddAlunos';
+} from "@/components/ui/select";
+import { useQueryGetAllPlanos } from "@/hooks/Alunos/UseQueryGetAllPlanos";
+import { iPlanos } from "../Interface/iPlanos";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { IceCream, Plus, Trash2 } from "lucide-react";
+import useMutationAddAlunos, {
+  CreateAlunoComEnderecosDto,
+} from "@/hooks/Alunos/Mutation/UseMutationAddAlunos";
 
 const alunoSchema = z.object({
-  tipo: z.string().min(1, 'Tipo de usuário é obrigatório'),
-  nome: z.string().min(1, 'Nome é obrigatório'),
-  email: z.string().email('Email inválido'),
-  telefone: z.string().min(1, 'Telefone é obrigatório'),
-  dataNascimento: z.string().min(1, 'Data de Nascimento é obrigatória'),
-  planoId: z.number().min(1, 'Selecione um plano'),
-  objetivos: z.string().min(1, 'Objetivos são obrigatórios'),
+  tipo: z.string().min(1, "Tipo de usuário é obrigatório"),
+  nome: z.string().min(1, "Nome é obrigatório"),
+  email: z.string().email("Email inválido"),
+  telefone: z.string().min(1, "Telefone é obrigatório"),
+  dataNascimento: z.string().min(1, "Data de Nascimento é obrigatória"),
+  planoId: z.number().min(1, "Selecione um plano"),
+  objetivos: z.string().min(1, "Objetivos são obrigatórios"),
   foto: z.string().optional(),
   enderecos: z.array(
     z.object({
-      rua: z.string().min(1, 'Rua é obrigatória'),
-      numero: z.string().min(1, 'Número é obrigatório'),
+      rua: z.string().min(1, "Rua é obrigatória"),
+      numero: z.string().min(1, "Número é obrigatório"),
       complemento: z.string().optional(),
-      bairro: z.string().min(1, 'Bairro é obrigatório'),
-      cidade: z.string().min(1, 'Cidade é obrigatória'),
-      estado: z.string().min(1, 'Estado é obrigatório'),
-      codigoPostal: z.string().min(1, 'Código Postal é obrigatório'),
-      pais: z.string().min(1, 'País é obrigatório'),
+      bairro: z.string().min(1, "Bairro é obrigatório"),
+      cidade: z.string().min(1, "Cidade é obrigatória"),
+      estado: z.string().min(1, "Estado é obrigatório"),
+      codigoPostal: z.string().min(1, "Código Postal é obrigatório"),
+      pais: z.string().min(1, "País é obrigatório"),
     })
   ),
 });
@@ -54,46 +63,50 @@ export default function EnhancedAlunoForm() {
   const form = useForm<AlunoFormValues>({
     resolver: zodResolver(alunoSchema),
     defaultValues: {
-      tipo: '',
-      nome: '',
-      email: '',
-      telefone: '',
-      objetivos: '',
-      dataNascimento: '',
-      foto: '',
+      tipo: "",
+      nome: "",
+      email: "",
+      telefone: "",
+      objetivos: "",
+      dataNascimento: "",
+      foto: "",
       planoId: 0,
       enderecos: [
         {
-          rua: '',
-          numero: '',
-          complemento: '',
-          bairro: '',
-          cidade: '',
-          estado: '',
-          codigoPostal: '',
-          pais: '',
+          rua: "",
+          numero: "",
+          complemento: "",
+          bairro: "",
+          cidade: "",
+          estado: "",
+          codigoPostal: "",
+          pais: "",
         },
       ],
     },
   });
+  const [isUploading, setIsUploading] = useState(false);
 
   const { control, handleSubmit, setValue, reset } = form;
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'enderecos',
+    name: "enderecos",
   });
+  const handleRemoveImage = () => {
+    setFotoBase64("");
+  };
 
   const { data: planos, isLoading, error, refetch } = useQueryGetAllPlanos();
-  const [fotoBase64, setFotoBase64] = useState('');
+  const [fotoBase64, setFotoBase64] = useState("");
   const onSubmit = async (data: AlunoFormValues) => {
     try {
-      const dataNascimentoUTC = new Date(data.dataNascimento);  // Converte para objeto Date
+      const dataNascimentoUTC = new Date(data.dataNascimento); // Converte para objeto Date
       const alunoData: CreateAlunoComEnderecosDto = {
         Nome: data.nome,
         Email: data.email,
         Foto: fotoBase64,
         Tipo: data.tipo,
-        DataNascimento: dataNascimentoUTC.toISOString(),  // Converte para string ISO em UTC
+        DataNascimento: dataNascimentoUTC.toISOString(), // Converte para string ISO em UTC
         Telefone: data.telefone,
         Objetivos: data.objetivos,
         Ativo: true,
@@ -101,7 +114,7 @@ export default function EnhancedAlunoForm() {
         Enderecos: data.enderecos.map((endereco) => ({
           Rua: endereco.rua,
           Numero: endereco.numero,
-          Complemento: endereco.complemento || '',
+          Complemento: endereco.complemento || "",
           Bairro: endereco.bairro,
           Cidade: endereco.cidade,
           Estado: endereco.estado,
@@ -109,19 +122,21 @@ export default function EnhancedAlunoForm() {
           Pais: endereco.pais,
         })),
       };
-  
+
       // Chama a mutação para adicionar o aluno
       const response = await useMutationAddAlunos(alunoData);
-      console.log('Aluno cadastrado com sucesso:', response);
-  
+      console.log("Aluno cadastrado com sucesso:", response);
+
       // Reseta o formulário após sucesso
       reset();
-      setFotoBase64('');
+      setFotoBase64("");
+
+      // Redireciona para a página /home/alunos
+      window.location.href = "/home/Alunos";
     } catch (error) {
-      console.error('Erro ao cadastrar aluno:', error);
+      console.error("Erro ao cadastrar aluno:", error);
     }
   };
-  
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -130,7 +145,7 @@ export default function EnhancedAlunoForm() {
       reader.onloadend = () => {
         const base64String = reader.result as string;
         setFotoBase64(base64String);
-        setValue('foto', base64String);
+        setValue("foto", base64String);
       };
       reader.readAsDataURL(file);
     }
@@ -151,10 +166,15 @@ export default function EnhancedAlunoForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 max-w-4xl mx-auto p-6">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-8 max-w-4xl mx-auto p-6"
+      >
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl font-bold">Cadastro de Aluno</CardTitle>
+            <CardTitle className="text-2xl font-bold">
+              Cadastro de Aluno
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="personal" className="w-full">
@@ -165,27 +185,63 @@ export default function EnhancedAlunoForm() {
               </TabsList>
               <TabsContent value="personal">
                 <div className="grid gap-6">
-                  <div className="flex items-center space-x-4">
-                    <Avatar className="w-24 h-24">
-                      <AvatarImage src={fotoBase64 || '/placeholder.svg'} alt="Foto do Aluno" />
+                    <div className="flex flex-col items-center space-y-4">
+                    <Avatar className="w-32 h-32 border-2 border-primary">
+                      <AvatarImage
+                      src={
+                        fotoBase64 || "/placeholder.svg?height=128&width=128"
+                      }
+                      alt="Foto do Aluno"
+                      />
                       <AvatarFallback>AL</AvatarFallback>
                     </Avatar>
-                    <div>
-                      <FormItem>
-                        <FormLabel>Foto</FormLabel>
-                        <FormControl>
-                          <Input type="file" accept="image/*" onChange={handleImageUpload} />
-                        </FormControl>
-                      </FormItem>
+                    <div className="flex items-center space-x-2">
+                      <Label htmlFor="picture" className="cursor-pointer">
+                      <div className="flex items-center space-x-2 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 rounded-md">
+                        {isUploading ? (
+                        <IceCream className="h-4 w-4 animate-spin" />
+                        ) : (
+                        <Plus className="h-4 w-4" />
+                        )}
+                        <span>
+                        {isUploading ? "Carregando..." : "Carregar foto"}
+                        </span>
+                      </div>
+                      <input
+                        id="picture"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="sr-only"
+                      />
+                      </Label>
+                      {fotoBase64 && (
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleRemoveImage}
+                        className="h-10 w-10"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                      )}
                     </div>
-                  </div>
+                    {fotoBase64 && (
+                      <p className="text-sm text-muted-foreground">
+                      Foto carregada com sucesso!
+                      </p>
+                    )}
+                    </div>
                   <FormField
                     control={control}
                     name="tipo"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Tipo de Usuário</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecione o tipo de usuário" />
@@ -221,7 +277,11 @@ export default function EnhancedAlunoForm() {
                         <FormItem>
                           <FormLabel>Email</FormLabel>
                           <FormControl>
-                            <Input type="email" placeholder="Digite o email" {...field} />
+                            <Input
+                              type="email"
+                              placeholder="Digite o email"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -276,19 +336,30 @@ export default function EnhancedAlunoForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Selecione o Plano</FormLabel>
-                        <Select onValueChange={(value: string) => field.onChange(Number(value))} value={field.value.toString()}>
+                        <Select
+                          onValueChange={(value: string) =>
+                            field.onChange(Number(value))
+                          }
+                          value={field.value.toString()}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecione um plano" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="0" disabled>Selecione um plano</SelectItem>
-                            {planos && planos.map((plano: iPlanos) => (
-                              <SelectItem key={plano.id} value={plano.id.toString()}>
-                                {`${plano.nome} - R$${plano.valor.toFixed(2)}`}
-                              </SelectItem>
-                            ))}
+                            <SelectItem value="0" disabled>
+                              Selecione um plano
+                            </SelectItem>
+                            {planos &&
+                              planos.map((plano: iPlanos) => (
+                                <SelectItem
+                                  key={plano.id}
+                                  value={plano.id.toString()}
+                                >
+                                  {`${plano.nome} - R$${plano.valor.toFixed(2)}`}
+                                </SelectItem>
+                              ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -302,7 +373,11 @@ export default function EnhancedAlunoForm() {
                       <FormItem>
                         <FormLabel>Objetivos</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Digite seus objetivos" {...field} className="min-h-[100px]" />
+                          <Textarea
+                            placeholder="Digite seus objetivos"
+                            {...field}
+                            className="min-h-[100px]"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -339,7 +414,10 @@ export default function EnhancedAlunoForm() {
                                 <FormItem>
                                   <FormLabel>Rua</FormLabel>
                                   <FormControl>
-                                    <Input placeholder="Digite a rua" {...field} />
+                                    <Input
+                                      placeholder="Digite a rua"
+                                      {...field}
+                                    />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -352,7 +430,10 @@ export default function EnhancedAlunoForm() {
                                 <FormItem>
                                   <FormLabel>Número</FormLabel>
                                   <FormControl>
-                                    <Input placeholder="Digite o número" {...field} />
+                                    <Input
+                                      placeholder="Digite o número"
+                                      {...field}
+                                    />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -366,7 +447,10 @@ export default function EnhancedAlunoForm() {
                               <FormItem>
                                 <FormLabel>Complemento</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="Digite o complemento" {...field} />
+                                  <Input
+                                    placeholder="Digite o complemento"
+                                    {...field}
+                                  />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -380,7 +464,10 @@ export default function EnhancedAlunoForm() {
                                 <FormItem>
                                   <FormLabel>Bairro</FormLabel>
                                   <FormControl>
-                                    <Input placeholder="Digite o bairro" {...field} />
+                                    <Input
+                                      placeholder="Digite o bairro"
+                                      {...field}
+                                    />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -393,7 +480,10 @@ export default function EnhancedAlunoForm() {
                                 <FormItem>
                                   <FormLabel>Cidade</FormLabel>
                                   <FormControl>
-                                    <Input placeholder="Digite a cidade" {...field} />
+                                    <Input
+                                      placeholder="Digite a cidade"
+                                      {...field}
+                                    />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -408,7 +498,10 @@ export default function EnhancedAlunoForm() {
                                 <FormItem>
                                   <FormLabel>Estado</FormLabel>
                                   <FormControl>
-                                    <Input placeholder="Digite o estado" {...field} />
+                                    <Input
+                                      placeholder="Digite o estado"
+                                      {...field}
+                                    />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -421,7 +514,10 @@ export default function EnhancedAlunoForm() {
                                 <FormItem>
                                   <FormLabel>Código Postal</FormLabel>
                                   <FormControl>
-                                    <Input placeholder="Digite o código postal" {...field} />
+                                    <Input
+                                      placeholder="Digite o código postal"
+                                      {...field}
+                                    />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -435,7 +531,10 @@ export default function EnhancedAlunoForm() {
                               <FormItem>
                                 <FormLabel>País</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="Digite o país" {...field} />
+                                  <Input
+                                    placeholder="Digite o país"
+                                    {...field}
+                                  />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -452,14 +551,14 @@ export default function EnhancedAlunoForm() {
                     className="mt-2"
                     onClick={() =>
                       append({
-                        rua: '',
-                        numero: '',
-                        complemento: '',
-                        bairro: '',
-                        cidade: '',
-                        estado: '',
-                        codigoPostal: '',
-                        pais: '',
+                        rua: "",
+                        numero: "",
+                        complemento: "",
+                        bairro: "",
+                        cidade: "",
+                        estado: "",
+                        codigoPostal: "",
+                        pais: "",
                       })
                     }
                   >
